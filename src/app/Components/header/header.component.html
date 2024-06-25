@@ -23,8 +23,13 @@
   </div>
   <div class="header__search-bar-container">
     <mat-form-field class="header__search-bar">
-      <input matInput (keyup)="search($event)" placeholder="search" />
-      <button mat-button *ngIf="query" (click)="clearSearch()">Clear</button>
+      <mat-label>Search</mat-label>
+      <input matInput type="text" [(ngModel)]="value" />
+      @if (value) {
+      <button matSuffix mat-icon-button aria-label="Clear" (click)="search()">
+        <mat-icon>search</mat-icon>
+      </button>
+      }
     </mat-form-field>
   </div>
 

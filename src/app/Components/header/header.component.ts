@@ -1,29 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MaterialModule } from '../../Material/Material.module';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [MaterialModule, CommonModule, RouterModule],
+  imports: [MaterialModule, CommonModule, RouterModule, FormsModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
 export class HeaderComponent {
-  public query: string = '';
+  value = '';
 
-  public search(event: KeyboardEvent) {
-    if (event.key == 'Backspace') {
-      if (this.query.length) this.query = this.query.slice(0, -1);
-    } else if (event.key.length == 1) {
-      this.query += event.key;
-    }
-    console.log(this.query);
-    // Implement your search logic here
-  }
-
-  public clearSearch() {
-    this.query = '';
+  public search(): void {
+    /*
+    add search logic
+    need to add routing to home component and THEN initiate search
+    */
   }
 }
