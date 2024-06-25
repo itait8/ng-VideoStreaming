@@ -3,6 +3,6 @@ export interface IUser {
   Email: string;
   PhotoURL: string;
   Uid: string;
-  UploadedVideos: Array<string>;
-  Favorites: Array<string>;
+  UploadedVideos: Array<string | null>;
+  Favorites: Array<string | null>;
 }
