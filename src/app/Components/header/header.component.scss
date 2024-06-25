@@ -1,0 +1,53 @@
+.header {
+  font-size: 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  padding: 30px;
+
+  &__sidebar {
+    ul {
+      padding: 0px;
+      li {
+        margin: 50px 0;
+        a {
+          text-decoration: none;
+          color: black;
+          .icon {
+            display: inline-block;
+            width: 23px;
+            padding-right: 30px;
+            i {
+              color: black;
+            }
+          }
+        }
+      }
+
+      list-style: none;
+    }
+  }
+
+  &__user {
+    margin-top: 5px;
+    display: flex;
+    align-items: end;
+  }
+
+  &__upload {
+    padding-right: 20px;
+  }
+
+  &__search-bar {
+    width: 800px;
+    display: inline-flex;
+  }
+
+  &__upload-button {
+    width: 45px !important;
+    min-width: unset !important;
+    i {
+      color: black;
+    }
+  }
+}

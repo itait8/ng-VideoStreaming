@@ -1,0 +1,41 @@
+<div class="header">
+  <div class="header__sidebar">
+    <div class="logo">
+      <img src="https://picsum.photos/200/56" alt="logo" />
+    </div>
+
+    <div class="d-flex text-center flex-wrap">
+      <ul>
+        <li>
+          <a [routerLink]="['/Home']" routerLinkActive="active">
+            <div class="icon"><i class="fa-solid fa-house"></i></div>
+            Home</a
+          >
+        </li>
+        <li>
+          <a [routerLink]="['/Channel']"
+            ><div class="icon"><i class="fa-solid fa-user"></i></div>
+            Channel</a
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="header__search-bar-container">
+    <mat-form-field class="header__search-bar">
+      <input matInput (keyup)="search($event)" placeholder="search" />
+      <button mat-button *ngIf="query" (click)="clearSearch()">Clear</button>
+    </mat-form-field>
+  </div>
+
+  <div class="header__user">
+    <div class="header__upload">
+      <button mat-raised-button class="header__upload-button">
+        <i class="fa-solid fa-arrow-up-from-bracket"></i>
+      </button>
+    </div>
+    <div class="header__user-login">
+      <button mat-raised-button>Login</button>
+    </div>
+  </div>
+</div>
