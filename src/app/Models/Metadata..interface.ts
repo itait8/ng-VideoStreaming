@@ -1,12 +1,12 @@
 import { IComment } from './Comment.interface';
 
 export interface IMetadata {
-  Uid: string;
-  UploadTime: Date;
-  VideoName: string;
-  UploadedBy: string;
-  Description: string;
-  Comments: Array<IComment>;
-  VideoURL: string;
-  VideoThumbnailURL: string;
+  uId: string;
+  uploadTime: Date | string;
+  name: string;
+  uploadedBy: string;
+  description: string;
+  comments: Array<IComment> | string;
+  videoURL: string;
+  ThumbnailURL: string;
 }

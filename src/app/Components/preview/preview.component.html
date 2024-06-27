@@ -1,0 +1,7 @@
+<div class="preview">
+  <div class="preview__container" *ngIf="metadata">
+    <img src="{{ metadata.ThumbnailURL }}" />
+    <h3>{{ metadata.name }}</h3>
+    <p>{{ metadata.uploadTime }}</p>
+  </div>
+</div>

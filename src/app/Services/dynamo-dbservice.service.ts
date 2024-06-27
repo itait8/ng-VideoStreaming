@@ -1,27 +1,22 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { IMetadata } from '../Models/Metadata..interface';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import * as data from '../../assets/mock_data/metadata/MOCK_DATA.json';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DynamoDBService {
-  private MockMD$: Subject<Array<IMetadata> | undefined>;
-  private mockMD: Array<IMetadata> | undefined;
+  private MockMD$: BehaviorSubject<Array<IMetadata>>;
+  private mockMD: Array<IMetadata>;
 
-  constructor(private http: HttpClient) {
-    this.http
-      .get('public/mock data/Videos/MOCK_DATA.json')
-      .subscribe((data) => {
-        this.mockMD = <Array<IMetadata>>data;
-      });
-    this.MockMD$ = new Subject();
-    this.MockMD$.next(this.mockMD);
-    console.log('flag 2');
+  constructor() {
+    this.mockMD = (data as any).default;
+    this.MockMD$ = new BehaviorSubject<Array<IMetadata>>((data as any).default);
   }
 
-  public getMetaData(): Observable<Array<IMetadata> | undefined> {
+  public getMetaData(): Observable<Array<IMetadata>> {
     return this.MockMD$.asObservable();
   }
 }

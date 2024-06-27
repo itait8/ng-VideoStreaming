@@ -1,0 +1,14 @@
+.metadatas-container {
+  position: relative;
+  &__grid {
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    left: 200px;
+    top: -200px;
+    max-width: 1500px;
+  }
+  &__cell {
+    border: 1px black solid;
+  }
+}
