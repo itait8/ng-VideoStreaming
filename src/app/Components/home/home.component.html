@@ -1,8 +1,11 @@
-<div class="metadatas-container">
-  <mat-grid-list cols="4" rowHeight="200px" class="metadatas-container__grid">
+<div class="metadatas-container" *ngIf="MDs && MockUser">
+  <mat-grid-list cols="4" rowHeight="300px" class="metadatas-container__grid">
     @for (metadata of MDs; track metadata) {
     <mat-grid-tile class="metadatas-container__cell"
-      ><app-preview [preview]="metadata"></app-preview
+      ><app-preview
+        [preview]="metadata"
+        [isFavoriteVideo]="checkIfFavorite(metadata)"
+      ></app-preview
     ></mat-grid-tile>
 
     }

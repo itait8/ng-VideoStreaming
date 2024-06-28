@@ -15,7 +15,7 @@ import { PreviewComponent } from '../preview/preview.component';
   imports: [MaterialModule, FormsModule, CommonModule, PreviewComponent],
 })
 export class HomeComponent implements OnInit {
-  private MockUser: IUser = {
+  public MockUser: IUser = {
     DisplayName: 'test Name',
     Email: 'test Email',
     PhotoURL: 'test PhotoURL',
@@ -25,7 +25,6 @@ export class HomeComponent implements OnInit {
   };
 
   public MDs: Array<IMetadata> = [];
-
   public numOfColumns: number = 4;
 
   constructor(private DynamoDBService: DynamoDBService) {
@@ -35,4 +34,8 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {}
+
+  public checkIfFavorite(metadata: IMetadata): boolean {
+    return this.MockUser.Favorites.includes(metadata.uId);
+  }
 }

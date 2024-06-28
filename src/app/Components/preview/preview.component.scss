@@ -1,18 +1,29 @@
 .preview {
+  margin: 5px;
+  img {
+    height: 180px;
+    width: 320px;
+    border-radius: 12px;
+  }
+
   &__container {
-    display: grid;
+    display: inline-flex;
+    justify-content: space-between;
+    width: 315px;
     align-items: center;
-    justify-items: center;
-    img {
-      height: 150px;
-      width: 150px;
-    }
-    h3 {
-      line-height: 3rem;
-      margin: 0;
+    h6 {
+      height: fit-content;
+      vertical-align: middle;
+      margin: 10px 0;
     }
     p {
       justify-self: start;
+    }
+  }
+
+  &__favorites {
+    mat-icon {
+      font-variation-settings: "FILL" 1;
     }
   }
 }

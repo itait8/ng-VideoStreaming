@@ -1,7 +1,14 @@
-<div class="preview">
-  <div class="preview__container" *ngIf="metadata">
-    <img src="{{ metadata.ThumbnailURL }}" />
-    <h3>{{ metadata.name }}</h3>
-    <p>{{ metadata.uploadTime }}</p>
+<div class="preview" *ngIf="metadata">
+  <img src="{{ metadata.ThumbnailURL }}" />
+  <div class="preview__container">
+    <div class="preview__text">
+      <h6>{{ metadata.name }}</h6>
+      <p>uploaded {{ uploadString }}</p>
+    </div>
+    <div class="preview__favorites">
+      <button mat-fab aria-label="add to favorites" (click)="bookmarkClick()">
+        <mat-icon #bookmark>{{ bookmarkIconType }}</mat-icon>
+      </button>
+    </div>
   </div>
 </div>
