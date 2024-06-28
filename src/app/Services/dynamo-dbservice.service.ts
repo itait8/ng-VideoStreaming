@@ -10,6 +10,7 @@ import * as data from '../../assets/mock_data/metadata/MOCK_DATA.json';
 export class DynamoDBService {
   private MockMD$: BehaviorSubject<Array<IMetadata>>;
   private mockMD: Array<IMetadata>;
+  private currentVideo: BehaviorSubject<IMetadata> | undefined
 
   constructor() {
     this.mockMD = (data as any).default;
@@ -19,4 +20,8 @@ export class DynamoDBService {
   public getMetaData(): Observable<Array<IMetadata>> {
     return this.MockMD$.asObservable();
   }
+  public getMetadataById(uId:string):IMetadata | undefined{
+    return this.mockMD.find((video)=>video.uId===uId);
+  }
+  
 }

@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { IMetadata } from '../../Models/Metadata..interface';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../Material/Material.module';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-preview',
@@ -26,6 +27,10 @@ export class PreviewComponent implements OnInit {
         this.formatStringToDate(this.metadata.uploadTime.toString())
       );
     }
+  }
+
+  constructor(private router:Router){
+
   }
 
   private formatStringToDate(uploadTime: string): Date {
@@ -78,5 +83,12 @@ export class PreviewComponent implements OnInit {
     if (this.isFavoriteVideo) {
       this.bookmarkIconType = 'bookmark';
     } else this.bookmarkIconType = 'bookmark_border';
+  }
+
+  public goToVideo():void{
+    if(this.metadata){
+    console.log("routing to video ...");
+    this.router.navigateByUrl('Video/' + this.metadata.uId);
+    }
   }
 }

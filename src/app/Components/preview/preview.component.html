@@ -1,5 +1,5 @@
 <div class="preview" *ngIf="metadata">
-  <img src="{{ metadata.ThumbnailURL }}" />
+  <img src="{{ metadata.ThumbnailURL }}" (click)="goToVideo()"/>
   <div class="preview__container">
     <div class="preview__text">
       <h6>{{ metadata.name }}</h6>
