@@ -9,18 +9,21 @@
     ul {
       padding: 0px;
       li {
-        margin: 50px 0;
+        margin: 10px 0;
         a {
           text-decoration: none;
-          color: black;
+          color: blue;
           .icon {
             display: inline-block;
             width: 23px;
-            padding-right: 30px;
-            i {
-              color: black;
-            }
+            padding-right: 3px;
+            
           }
+        }
+
+        a:hover{
+          color:darkblue;
+          
         }
       }
 
