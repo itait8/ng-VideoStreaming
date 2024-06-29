@@ -24,6 +24,6 @@ export class HeaderComponent {
   }
 
   public signIn() {
-    this.cognitoService.signUp();
+    
   }
 }

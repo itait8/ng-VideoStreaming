@@ -1,29 +1,30 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Amplify } from 'aws-amplify';
-import { enviroment } from '../../enviroment/emviroment';
-import { IUser } from '../Models/User.interface';
-import * as Auth from 'aws-amplify/auth';
+import * as AWS from 'aws-sdk';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CognitoService {
-  private authenticationSubject: BehaviorSubject<any>;
+
 
   constructor() {
-    Amplify.configure({
-      Auth: enviroment,
-    });
 
-    this.authenticationSubject = new BehaviorSubject<boolean>(false);
+
+
   }
-
+  public signinCallback(authResult:any) {
+    if (authResult['status']['signed_in']) {
+  
+       // Add the Google access token to the Amazon Cognito credentials login map.
+       AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+          IdentityPoolId: 'eu-north-1_UycprTKYo',
+          Logins: {
+             'accounts.google.com': authResult['id_token']
+          }
+       });
+    }
+  }
   public signUp() {
-    console.log('redirecting...');
-
-    Auth.signInWithRedirect({ provider: 'Google' }).catch((err) =>
-      console.log(err)
-    );
   }
 }
