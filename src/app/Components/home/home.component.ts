@@ -19,7 +19,7 @@ export class HomeComponent implements OnInit {
     DisplayName: 'test Name',
     Email: 'test Email',
     PhotoURL: 'test PhotoURL',
-    Uid: 'test uid',
+    uId: 'test uid',
     UploadedVideos: [null],
     Favorites: [null],
   };

@@ -1,24 +1,50 @@
 import { Injectable } from '@angular/core';
+
 import { IUser } from '../Models/User.interface';
+import { Router } from '@angular/router';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-  public isUserLoggedIn: boolean = false;
+  private isLoggenIn$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
+    false
+  );
 
-  constructor() { }
+  private userDetails$: Subject<IUser> = new Subject<IUser>();
+  private userId: string = '';
 
-  private getUsers(){
-
+  constructor(private router: Router) {
+    if (typeof localStorage != 'undefined') {
+      const savedUserString = localStorage.getItem('user');
+      if (savedUserString != null) this.isLoggenIn$.next(true);
+    }
   }
 
-  public addUser(newUser:IUser):void{
+  public signInWithGoogle() {
+    //add sign in with google
   }
 
-  public validateUser(user:IUser):boolean{
-    //add varification
-    return true;
+  public signOut(): Promise<void> {
+    return Promise.resolve();
+    //add sign out
   }
-  
+
+  public isLoggenIn(): Observable<boolean> {
+    return this.isLoggenIn$.asObservable();
+  }
+
+  public getUserData(): Observable<IUser> {
+    return this.userDetails$.asObservable();
+  }
+
+  private authLogin() {
+    //login
+  }
+
+  private setUserData(user?: IUser): Promise<void> | void {
+    //insetring new user to db
+    return Promise.resolve();
+  }
 }

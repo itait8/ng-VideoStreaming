@@ -1,7 +1,8 @@
 <div class="header">
   <div class="header__sidebar">
     <div class="logo">
-      <img src="https://picsum.photos/200/56" alt="logo" />
+      <!-- logo needs to be 402 by  114 px -->
+      <img src="assets\Logo\logo_ver2.webp" alt="logo" />
     </div>
 
     <div class="d-flex text-center flex-wrap">
@@ -40,7 +41,7 @@
       </button>
     </div>
     <div class="header__user-login">
-      <button mat-raised-button>Login</button>
+      <button mat-raised-button (click)="signIn()">Login</button>
     </div>
   </div>
 </div>
