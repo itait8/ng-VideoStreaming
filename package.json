@@ -24,6 +24,8 @@
     "@angular/router": "^18.0.0",
     "@angular/ssr": "^18.0.2",
     "@aws-amplify/ui-angular": "^5.0.16",
+    "@aws-sdk/client-dynamodb": "^3.606.0",
+    "@aws-sdk/lib-dynamodb": "^3.606.0",
     "@fortawesome/angular-fontawesome": "^0.15.0",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "aws-amplify": "^6.3.8",
