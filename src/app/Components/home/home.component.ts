@@ -6,6 +6,7 @@ import { MaterialModule } from '../../Material/Material.module';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PreviewComponent } from '../preview/preview.component';
+import { VideoService } from '../../Services/video.service';
 
 @Component({
   selector: 'app-home',
@@ -27,8 +28,8 @@ export class HomeComponent implements OnInit {
   public MDs: Array<IMetadata> = [];
   public numOfColumns: number = 4;
 
-  constructor(private DynamoDBService: DynamoDBService) {
-    this.DynamoDBService.getMetaData().subscribe((data) => {
+  constructor(private videoService: VideoService) {
+    this.videoService.getMetadata()?.subscribe((data) => {
       this.MDs = data;
     });
   }
