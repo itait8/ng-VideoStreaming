@@ -16,6 +16,8 @@ export class VideoService {
       this.MDs = data;
       this.MDs$ = new BehaviorSubject(data);
     });
+
+    awsService.generateUrl();
   }
 
   public getMetadata(): Observable<Array<IMetadata>> | undefined {
