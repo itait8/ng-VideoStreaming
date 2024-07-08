@@ -3,12 +3,15 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { IMetadata } from '../Models/Metadata..interface';
 import * as data from '../../assets/mock_data/metadata/MOCK_DATA.json';
 import {
-  GetObjectAclCommand,
+  GetObjectCommand,
   PutObjectCommand,
   S3Client,
   S3ClientConfig,
 } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import {
+  getSignedUrl,
+  S3RequestPresigner,
+} from '@aws-sdk/s3-request-presigner';
 import { DYNAMO_DB_SERVICE_ACCOUNT } from '../../enviroment/emviroment';
 
 @Injectable({
@@ -60,15 +63,15 @@ export class AwsService {
       ContentType: contentType,
     }); */
 
-    const command = new GetObjectAclCommand({
+    const command = new GetObjectCommand({
       Bucket: 'animusvision-videos-storage',
       Key: 'תיעודים מבצעיים של שיגור מיירטי כיפת ברזל ויירוטים שבוצעו בדרום הארץ בימים האחרונים.mp4',
     });
 
-    /* const url = await getSignedUrl(s3, command, {
+    const url = await getSignedUrl(s3, command, {
       expiresIn: expirationMinutes,
     });
 
-    console.log(url); */
+    return url;
   }
 }

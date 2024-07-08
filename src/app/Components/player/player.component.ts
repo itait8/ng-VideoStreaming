@@ -15,6 +15,9 @@ import { VideoService } from '../../Services/video.service';
 export class PlayerComponent {
   public video: IMetadata | undefined;
   constructor(private videoService: VideoService, private router: Router) {
+    videoService.generateURL().then((res) => {
+      if (this.video?.videoURL) this.video.videoURL = res as string;
+    });
     this.video = videoService.getMetadataById(router.url.split('/')[2]);
   }
 }
