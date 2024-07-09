@@ -1,9 +1,9 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { MaterialModule } from '../../Material/Material.module';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CognitoService } from '../../Services/cognito.service';
+import { AuthService } from '../../Services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -15,7 +15,7 @@ import { CognitoService } from '../../Services/cognito.service';
 export class HeaderComponent {
   value = '';
 
-  constructor(private cognitoService: CognitoService) {}
+  constructor(private authService: AuthService) {}
   public search(): void {
     /*
     add search logic
@@ -23,7 +23,7 @@ export class HeaderComponent {
     */
   }
 
-  public signIn() {
-    //this.cognitoService.signInCallback();
+  public redirectToLogin(): void {
+    this.authService.loginPage();
   }
 }
