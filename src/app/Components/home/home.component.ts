@@ -9,6 +9,7 @@ import { PreviewComponent } from '../preview/preview.component';
 import { VideoService } from '../../Services/video.service';
 import { AuthService } from '../../Services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import * as jwt from 'jwt-decode';
 
 @Component({
   selector: 'app-home',
@@ -42,7 +43,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(async (params: any) => {
+    /* this.route.queryParams.subscribe(async (params: any) => {
       const code = params['code'];
       console.log('code: ', code);
 
@@ -68,7 +69,22 @@ export class HomeComponent implements OnInit {
         console.error('Missing code parameter in the redirect URL');
         // Handle missing code parameter error
       }
+    }); */
+
+    this.route.queryParams.subscribe((params: any) => {
+      const token = params;
+      console.log('params: ', params);
+      console.log('token: ', token);
+      setTimeout(() => console.log('params: ', params), 5000);
     });
+
+    console.log(this.router.url.split(/[#&=]/));
+    const parsedUrl = this.router.url.split(/[#&=]/);
+    const idToken = parsedUrl[2];
+    const accessToken = parsedUrl[4];
+    if (idToken) {
+      console.log(jwt.jwtDecode(idToken));
+    }
   }
 
   public checkIfFavorite(metadata: IMetadata): boolean {

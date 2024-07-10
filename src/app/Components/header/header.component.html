@@ -35,13 +35,16 @@
   </div>
 
   <div class="header__user">
-    <div class="header__upload">
+    <div class="header__upload" *ngIf="isLoggedIn">
       <button mat-raised-button class="header__upload-button">
         <i class="fa-solid fa-arrow-up-from-bracket"></i>
       </button>
     </div>
-    <div class="header__user-login">
+    <div class="header__user-login" *ngIf="!isLoggedIn">
       <button mat-raised-button (click)="redirectToLogin()">Login</button>
+    </div>
+    <div class="header__user-logout" *ngIf="isLoggedIn">
+      <button mat-raised-button (click)="logOut()">LogOut</button>
     </div>
   </div>
 </div>
