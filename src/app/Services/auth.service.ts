@@ -3,6 +3,8 @@ import {
   CognitoIdentityProviderClient,
   InitiateAuthCommand,
   UpdateUserAttributesCommand,
+  GetUserAttributeVerificationCodeCommand,
+  GetUserCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 import { IUser } from '../Models/User.interface';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,6 +13,7 @@ import { COGNITO_CONFIG } from '../../enviroment/emviroment';
 import { HttpClient } from '@angular/common/http';
 import * as jwt from 'jwt-decode';
 import { JwtPayload } from 'jwt-decode';
+import { access } from 'fs';
 
 @Injectable({
   providedIn: 'root',
@@ -19,56 +22,12 @@ export class AuthService {
   private isLoggenIn$: BehaviorSubject<boolean> = new BehaviorSubject(false);
   private cognitoClient: CognitoIdentityProviderClient;
   private userDetails$: Subject<IUser> = new Subject<IUser>();
+  private accessToken: string = '';
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private http: HttpClient
-  ) {
+  constructor(private router: Router) {
     this.cognitoClient = new CognitoIdentityProviderClient({
       region: COGNITO_CONFIG.REGION,
     });
-  }
-
-  async exchangeCodeForTokens(
-    code: string
-  ): Promise<{ idToken: string; accessToken: string }> {
-    const command = new InitiateAuthCommand({
-      AuthFlow: 'REFRESH_TOKEN',
-      ClientId: COGNITO_CONFIG.COGNITO_CLIENT_ID,
-      AuthParameters: {
-        CODE: code,
-        REDIRECT_URI: COGNITO_CONFIG.COGNITO_REDIRECT_URL,
-      },
-    });
-
-    try {
-      console.log(command);
-      const response = await this.cognitoClient.send(command);
-      console.log(response);
-      const idToken = response.AuthenticationResult?.IdToken;
-      console.log(idToken);
-      const accessToken = response.AuthenticationResult?.AccessToken;
-      console.log(accessToken);
-
-      if (idToken && accessToken) {
-        return { idToken, accessToken };
-      } else {
-        throw new Error('Failed to exchange code for tokens');
-      }
-    } catch (error) {
-      console.error('Error exchanging code for tokens:', error);
-      throw error;
-    }
-  }
-
-  decodeIdToken(idToken: string): any {
-    try {
-      return jwt.jwtDecode(idToken);
-    } catch (error) {
-      console.error('Error decoding ID token:', error);
-      throw error;
-    }
   }
 
   public loginPage(): void {
@@ -80,46 +39,93 @@ export class AuthService {
   public isLoggedIn() {
     return this.isLoggenIn$.asObservable();
   }
+
   public logOut(): void {
     this.isLoggenIn$.next(false);
   }
 
-  public getToken(): Observable<IUser> | undefined {
+  public getTokens(url: string): { accessToken: string; idToken: string } {
     const parsedUrl = this.router.url.split(/[#&=]/);
+    console.log(parsedUrl);
     const idToken = parsedUrl[2];
-    if (idToken) {
+    const accessToken = parsedUrl[4];
+    return { accessToken, idToken };
+  }
+
+  public login(): void {
+    const Tokens = this.getTokens(this.router.url);
+    const idToken = Tokens.idToken;
+    this.accessToken = Tokens.accessToken;
+    /*   if (idToken) {
       this.isLoggenIn$.next(true);
       const decodedToken: any = jwt.jwtDecode(idToken);
-      const userData = {
+      var userData: IUser = {
         DisplayName: decodedToken['name'],
-        Email: decodedToken['email'],
+        email: decodedToken['email'],
         PhotoURL: decodedToken['picture'],
         uId: decodedToken.sub,
-      };
-      this.userDetails$.next(userData);
-      //this.router.navigate([`/Home`]);
-      this.updateUser(parsedUrl[2]);
-    }
+      }; */
 
-    return this.userDetails$.asObservable();
+    var userData: IUser;
+    const input = {
+      AccessToken: this.accessToken,
+    };
+    const command = new GetUserCommand(input);
+
+    this.cognitoClient
+      .send(command)
+      .then((res) => {
+        console.log(res);
+        res.UserAttributes?.forEach((attribute) => {
+          if (attribute.Value)
+            switch (attribute.Name) {
+              case 'custom:favoritesVideos':
+                userData.Favorites = attribute.Value.split(',');
+                break;
+              case 'name':
+                userData.DisplayName = attribute.Value;
+                break;
+              case 'custom:uploadedVideos':
+                userData.UploadedVideos = attribute.Value.split(',');
+                break;
+              case 'email':
+                console.log(attribute.Value);
+                userData.email = attribute.Value;
+                console.log(attribute.Value);
+                break;
+              case 'picture':
+                userData.PhotoURL = attribute.Value;
+                break;
+              case 'sub':
+                userData.uId = attribute.Value;
+                break;
+            }
+        });
+        this.userDetails$.next(userData);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    //this.router.navigate([`/Home`]);
+    //this.updateUser(parsedUrl[4]);
   }
 
   public getUser(): Observable<IUser> {
     return this.userDetails$.asObservable();
   }
 
+  public getUserAttribute(attribute: string, accessToken: string): void {
+    //const commandInput = new
+  }
   public updateUser(accessToken: string): void {
-    const client = new CognitoIdentityProviderClient({
-      region: COGNITO_CONFIG.REGION,
-    });
-    console.log(accessToken);
     const input = {
-      UserAttributes: [{ Name: 'picture', Value: '1234' }],
+      UserAttributes: [{ Name: 'custom:favoritesVideos', Value: '1234' }],
       AccessToken: accessToken,
     };
 
     const command = new UpdateUserAttributesCommand(input);
-    client
+    this.cognitoClient
       .send(command)
       .then((res) => console.log(res))
       .catch((err) => console.log(err));

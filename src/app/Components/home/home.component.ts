@@ -25,7 +25,7 @@ import {
 export class HomeComponent implements OnInit {
   public MockUser: IUser = {
     DisplayName: 'test Name',
-    Email: 'test Email',
+    email: 'test Email',
     PhotoURL: 'test PhotoURL',
     uId: 'test uid',
   };
@@ -48,10 +48,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.authService.getToken()?.subscribe((user) => {
-      console.log(user);
-      this.MockUser = user;
-    });
+    this.authService.login();
   }
 
   public checkIfFavorite(metadata: IMetadata): boolean {
