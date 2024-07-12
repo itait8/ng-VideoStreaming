@@ -36,7 +36,11 @@
 
   <div class="header__user">
     <div class="header__upload" *ngIf="isLoggedIn">
-      <button mat-raised-button class="header__upload-button">
+      <button
+        mat-raised-button
+        class="header__upload-button"
+        (click)="openDialog()"
+      >
         <i class="fa-solid fa-arrow-up-from-bracket"></i>
       </button>
     </div>

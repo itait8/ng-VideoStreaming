@@ -6,3 +6,12 @@ export interface IUser {
   UploadedVideos?: Array<string>;
   Favorites?: Array<string | null>;
 }
+
+export const emptyUser: IUser = {
+  DisplayName: '',
+  email: '',
+  PhotoURL: '',
+  uId: '',
+  UploadedVideos: [],
+  Favorites: [],
+};

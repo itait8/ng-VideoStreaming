@@ -1,19 +1,17 @@
 import { Injectable } from '@angular/core';
 import {
   CognitoIdentityProviderClient,
-  InitiateAuthCommand,
   UpdateUserAttributesCommand,
-  GetUserAttributeVerificationCodeCommand,
   GetUserCommand,
+  GetUserCommandOutput,
 } from '@aws-sdk/client-cognito-identity-provider';
-import { IUser } from '../Models/User.interface';
-import { ActivatedRoute, Router } from '@angular/router';
+import { IUser, emptyUser } from '../Models/User.interface';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { COGNITO_CONFIG } from '../../enviroment/emviroment';
-import { HttpClient } from '@angular/common/http';
-import * as jwt from 'jwt-decode';
-import { JwtPayload } from 'jwt-decode';
-import { access } from 'fs';
+import { IMetadata } from '../Models/Metadata..interface';
+import { S3Service } from './s3.service';
+import { stringify } from 'querystring';
 
 @Injectable({
   providedIn: 'root',
@@ -22,9 +20,13 @@ export class AuthService {
   private isLoggenIn$: BehaviorSubject<boolean> = new BehaviorSubject(false);
   private cognitoClient: CognitoIdentityProviderClient;
   private userDetails$: Subject<IUser> = new Subject<IUser>();
-  private accessToken: string = '';
+  private user: IUser = emptyUser;
+  private Tokens: { accessToken: string; idToken: string } = {
+    accessToken: '',
+    idToken: '',
+  };
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private s3Service: S3Service) {
     this.cognitoClient = new CognitoIdentityProviderClient({
       region: COGNITO_CONFIG.REGION,
     });
@@ -42,86 +44,76 @@ export class AuthService {
 
   public logOut(): void {
     this.isLoggenIn$.next(false);
+    this.Tokens = { accessToken: '', idToken: '' };
+    this.user = emptyUser;
   }
 
-  public getTokens(url: string): { accessToken: string; idToken: string } {
+  private setTokens(url: string): void {
     const parsedUrl = this.router.url.split(/[#&=]/);
-    console.log(parsedUrl);
-    const idToken = parsedUrl[2];
-    const accessToken = parsedUrl[4];
-    return { accessToken, idToken };
+    const idToken =
+      parsedUrl[parsedUrl.findIndex((attr) => attr == 'id_token') + 1];
+    const accessToken =
+      parsedUrl[parsedUrl.findIndex((attr) => attr == 'access_token') + 1];
+    this.Tokens = { accessToken, idToken };
   }
 
   public login(): void {
-    const Tokens = this.getTokens(this.router.url);
-    const idToken = Tokens.idToken;
-    this.accessToken = Tokens.accessToken;
-    /*   if (idToken) {
-      this.isLoggenIn$.next(true);
-      const decodedToken: any = jwt.jwtDecode(idToken);
-      var userData: IUser = {
-        DisplayName: decodedToken['name'],
-        email: decodedToken['email'],
-        PhotoURL: decodedToken['picture'],
-        uId: decodedToken.sub,
-      }; */
+    this.setTokens(this.router.url);
 
-    var userData: IUser;
     const input = {
-      AccessToken: this.accessToken,
+      AccessToken: this.Tokens.accessToken,
     };
     const command = new GetUserCommand(input);
 
     this.cognitoClient
       .send(command)
       .then((res) => {
-        console.log(res);
-        res.UserAttributes?.forEach((attribute) => {
-          if (attribute.Value)
-            switch (attribute.Name) {
-              case 'custom:favoritesVideos':
-                userData.Favorites = attribute.Value.split(',');
-                break;
-              case 'name':
-                userData.DisplayName = attribute.Value;
-                break;
-              case 'custom:uploadedVideos':
-                userData.UploadedVideos = attribute.Value.split(',');
-                break;
-              case 'email':
-                console.log(attribute.Value);
-                userData.email = attribute.Value;
-                console.log(attribute.Value);
-                break;
-              case 'picture':
-                userData.PhotoURL = attribute.Value;
-                break;
-              case 'sub':
-                userData.uId = attribute.Value;
-                break;
-            }
-        });
-        this.userDetails$.next(userData);
+        this.setUser(res);
       })
       .catch((err) => {
         console.log(err);
       });
+  }
 
-    //this.router.navigate([`/Home`]);
-    //this.updateUser(parsedUrl[4]);
+  private setUser(getUserCommantOutput: GetUserCommandOutput): void {
+    getUserCommantOutput.UserAttributes?.forEach((attribute) => {
+      if (attribute.Value)
+        switch (attribute.Name) {
+          case 'custom:favoritesVideos':
+            this.user.Favorites = attribute.Value.split(',');
+            break;
+          case 'name':
+            this.user.DisplayName = attribute.Value;
+            break;
+          case 'custom:uploadedVideos':
+            this.user.UploadedVideos = attribute.Value.split(',');
+            break;
+          case 'email':
+            this.user.email = attribute.Value;
+            break;
+          case 'picture':
+            this.user.PhotoURL = attribute.Value;
+            break;
+          case 'sub':
+            this.user.uId = attribute.Value;
+            break;
+        }
+    });
+    this.isLoggenIn$.next(true);
+    this.userDetails$.next(this.user);
+    console.log(this.user);
+    console.log(this.userDetails$);
+    //this.router.navigate(['/Home']);
   }
 
   public getUser(): Observable<IUser> {
     return this.userDetails$.asObservable();
   }
 
-  public getUserAttribute(attribute: string, accessToken: string): void {
-    //const commandInput = new
-  }
-  public updateUser(accessToken: string): void {
+  public updateUser(name: string, value: string): void {
     const input = {
-      UserAttributes: [{ Name: 'custom:favoritesVideos', Value: '1234' }],
-      AccessToken: accessToken,
+      UserAttributes: [{ Name: name, Value: value }],
+      AccessToken: this.Tokens.accessToken,
     };
 
     const command = new UpdateUserAttributesCommand(input);
@@ -129,5 +121,34 @@ export class AuthService {
       .send(command)
       .then((res) => console.log(res))
       .catch((err) => console.log(err));
+  }
+
+  public addFavorite(videoURL: string): void {
+    this.updateUser(
+      'custom:favoritesVideos',
+      videoURL + ', ' + (this.user.Favorites || [])
+    );
+    console.log(this.user.Favorites);
+  }
+
+  public removeFavorite(videoURL: string): void {
+    if (
+      this.user.Favorites?.findIndex((favorite) => favorite == videoURL) != -1
+    )
+      this.updateUser(
+        'custom:favoritesVideos',
+        this.user.Favorites?.filter((favorite) => favorite != videoURL).join(
+          ', '
+        ) || ''
+      );
+    console.log(this.user.Favorites);
+  }
+
+  public getUserId() {
+    return this.user.uId;
+  }
+  public async uploadVideo(metadata: IMetadata, video: any) {
+    this.s3Service.uploadVideo(video);
+    console.log(metadata);
   }
 }

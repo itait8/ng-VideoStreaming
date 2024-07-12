@@ -1,0 +1,36 @@
+<h2 mat-dialog-title>Upload a new video</h2>
+<mat-dialog-content>
+  <form #f="ngForm">
+    <mat-form-field>
+      <mat-label>Video Name</mat-label>
+      <input ngModel name="name" matInput required />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Description</mat-label>
+      <textarea ngModel name="description" matInput></textarea>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Tumbnail</mat-label>
+      <input ngModel name="thumbnail" matInput required />
+    </mat-form-field>
+    <div>
+      <button type="button" mat-raised-button (click)="fileInput.click()">
+        Choose File
+      </button>
+      <input
+        required
+        hidden
+        (change)="onFileSelected($event)"
+        #fileInput
+        type="file"
+        ngModel
+        name="video"
+      />
+      <span class="file-name">{{ selectedFile?.name }}</span>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button (click)="uploadVideo()" cdkFocusInitial>Upload</button>
+</mat-dialog-actions>

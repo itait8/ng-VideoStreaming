@@ -1,10 +1,12 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { MaterialModule } from '../../Material/Material.module';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../Services/auth.service';
 import { Subscription } from 'rxjs';
+import { UploadComponent } from '../upload/upload.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-header',
@@ -42,5 +44,14 @@ export class HeaderComponent implements OnDestroy {
 
   public logOut(): void {
     this.authService.logOut();
+  }
+
+  readonly dialog = inject(MatDialog);
+
+  public openDialog(): void {
+    this.dialog.open(UploadComponent, {
+      width: '450px',
+      height: '600px',
+    });
   }
 }

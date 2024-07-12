@@ -3,6 +3,8 @@ import { IMetadata } from '../../Models/Metadata..interface';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../Material/Material.module';
 import { Router } from '@angular/router';
+import { AuthService } from '../../Services/auth.service';
+import { IUser, emptyUser } from '../../Models/User.interface';
 
 @Component({
   selector: 'app-preview',
@@ -12,12 +14,14 @@ import { Router } from '@angular/router';
   styleUrl: './preview.component.scss',
 })
 export class PreviewComponent implements OnInit {
+  private user: IUser = emptyUser;
   public metadata: IMetadata | undefined;
   public uploadString: string = '';
 
   public bookmarkIconType: string = '';
 
-  @Input() isFavoriteVideo: boolean = false;
+  @Input()
+  isFavoriteVideo!: boolean;
 
   @Input() set preview(preview: IMetadata) {
     if (preview) {
@@ -29,8 +33,8 @@ export class PreviewComponent implements OnInit {
     }
   }
 
-  constructor(private router:Router){
-
+  constructor(private router: Router, private authService: AuthService) {
+    this.authService.getUser().subscribe((user) => (this.user = user));
   }
 
   private formatStringToDate(uploadTime: string): Date {
@@ -67,28 +71,23 @@ export class PreviewComponent implements OnInit {
 
   public bookmarkClick() {
     this.isFavoriteVideo = !this.isFavoriteVideo;
-    if (this.isFavoriteVideo) {
-      this.bookmarkIconType = 'bookmark';
-      this.addToFavorites();
-    } else {
-      this.bookmarkIconType = 'bookmark_border';
-      this.removeFromFavorites();
-    }
+    if (this.isFavoriteVideo) this.addToFavorites();
+    else this.removeFromFavorites();
   }
 
-  public addToFavorites() {}
-  public removeFromFavorites() {}
-
-  ngOnInit(): void {
-    if (this.isFavoriteVideo) {
-      this.bookmarkIconType = 'bookmark';
-    } else this.bookmarkIconType = 'bookmark_border';
+  public addToFavorites() {
+    if (this.metadata) this.authService.addFavorite(this.metadata?.uId);
+  }
+  public removeFromFavorites() {
+    if (this.metadata) this.authService.removeFavorite(this.metadata?.uId);
   }
 
-  public goToVideo():void{
-    if(this.metadata){
-    console.log("routing to video ...");
-    this.router.navigateByUrl('Video/' + this.metadata.uId);
+  ngOnInit(): void {}
+
+  public goToVideo(): void {
+    if (this.metadata) {
+      console.log('routing to video ...');
+      this.router.navigateByUrl('Video/' + this.metadata.uId);
     }
   }
 }

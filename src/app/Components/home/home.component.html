@@ -1,4 +1,4 @@
-<div class="metadatas-container" *ngIf="MDs && MockUser">
+<div class="metadatas-container" *ngIf="MDs && user">
   <mat-grid-list cols="3" rowHeight="300px" class="metadatas-container__grid">
     @for (metadata of MDs; track metadata) {
     <mat-grid-tile class="metadatas-container__cell"

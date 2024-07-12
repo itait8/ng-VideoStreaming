@@ -7,7 +7,9 @@
     </div>
     <div class="preview__favorites">
       <button mat-fab aria-label="add to favorites" (click)="bookmarkClick()">
-        <mat-icon>{{ bookmarkIconType }}</mat-icon>
+        <mat-icon>{{
+          isFavoriteVideo ? "bookmark" : "bookmark_border"
+        }}</mat-icon>
       </button>
     </div>
   </div>
