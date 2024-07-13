@@ -12,6 +12,8 @@ import {
   S3_CONFIG,
 } from '../../enviroment/emviroment';
 
+import { v4 as uuid4 } from 'uuid';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -26,17 +28,29 @@ export class S3Service {
 
   constructor() {}
 
-  public async uploadVideo(file: any) {
+  public uploadVideo(file: any, uId: string) {
     const command = new PutObjectCommand({
       Bucket: S3_CONFIG.BUCKETS.videos,
-      Key: file.name,
+      Key: uId,
       Body: file,
       ContentType: file.type,
     });
-    console.log(command);
-    const response = await this.s3Client.send(command);
-    console.log(response);
-    return response;
+    this.s3Client.send(command);
+  }
+
+  public async getVideo(fileName: string) {
+    let expirationMinutes = 60;
+
+    const command = new GetObjectCommand({
+      Bucket: 'animusvision-videos-storage',
+      Key: fileName,
+    });
+
+    const url = await getSignedUrl(this.s3Client, command, {
+      expiresIn: expirationMinutes * 60,
+    });
+
+    return url;
   }
 
   public async generateUrl /* directory: string,

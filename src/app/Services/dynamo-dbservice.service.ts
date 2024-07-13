@@ -8,6 +8,7 @@ import {
   PutItemCommand,
   PutItemCommandInput,
   GetItemCommand,
+  ScanCommand,
 } from '@aws-sdk/client-dynamodb';
 import { DYNAMO_DB_SERVICE_ACCOUNT } from '../../enviroment/emviroment';
 
@@ -23,41 +24,62 @@ export class DynamoDBService {
     },
   });
 
-  private MockMD$: BehaviorSubject<Array<IMetadata>>;
-  private mockMD: Array<IMetadata>;
+  private MDs: Array<IMetadata> = [];
+  private MDs$ = new BehaviorSubject(this.MDs);
   private currentVideo: BehaviorSubject<IMetadata> | undefined;
 
   constructor() {
-    this.mockMD = (data as any).default;
-    this.MockMD$ = new BehaviorSubject<Array<IMetadata>>((data as any).default);
+    this.downloadMds();
+  }
 
+  private uploadMD(md: IMetadata) {
     const putItemParams: PutItemCommandInput = {
       TableName: DYNAMO_DB_SERVICE_ACCOUNT.TABLES.metadata,
       Item: {
-        uId: { S: '123' },
-        name: { S: 'Test' },
+        uId: { S: md.uId },
+        name: { S: md.name },
+        uploadTime: { S: md.uploadTime.getTime().toString() },
+        uploadedBy: { S: md.uploadedBy },
+        description: { S: md.description },
+        ThumbnailURL: { S: md.ThumbnailURL },
       },
     };
     const putItemCommand = new PutItemCommand(putItemParams);
-    this.client.send(putItemCommand);
-    console.log('item sent to db');
+    this.client.send(putItemCommand).then(() => this.MDs.push(md));
+  }
 
-    const getItemParams = {
-      TableName: DYNAMO_DB_SERVICE_ACCOUNT.TABLES.metadata,
-      Key: {
-        uId: { S: '123' },
-      },
-    };
-
-    const getItemCommand = new GetItemCommand(getItemParams);
-    const response = this.client.send(getItemCommand);
-    console.log(response);
+  public insertMD(metadata: IMetadata) {
+    this.uploadMD(metadata);
   }
 
   public getMetaData(): Observable<Array<IMetadata>> {
-    return this.MockMD$.asObservable();
+    return this.MDs$.asObservable();
   }
   public getMetadataById(uId: string): IMetadata | undefined {
-    return this.mockMD.find((video) => video.uId === uId);
+    return this.MDs.find((video) => video.uId === uId);
+  }
+
+  public downloadMds() {
+    const scanCommand = new ScanCommand({
+      TableName: DYNAMO_DB_SERVICE_ACCOUNT.TABLES.metadata,
+    });
+
+    this.client
+      .send(scanCommand)
+      .then((res) => {
+        res.Items?.forEach((item) => {
+          console.log(item);
+          this.MDs.push({
+            uId: item['uId'].S || '',
+            name: item['name'].S || '',
+            uploadTime: new Date(Number(item['uploadTime'].S) || '2000-01-01'),
+            uploadedBy: item['uploadedBy'].S || '',
+            description: item['description'].S || '',
+            ThumbnailURL: item['ThumbnailURL'].S || '',
+            comments: item['comments']?.S || '',
+          });
+        });
+      })
+      .catch((err) => console.log(err));
   }
 }

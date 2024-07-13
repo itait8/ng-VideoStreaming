@@ -12,6 +12,7 @@ import { COGNITO_CONFIG } from '../../enviroment/emviroment';
 import { IMetadata } from '../Models/Metadata..interface';
 import { S3Service } from './s3.service';
 import { stringify } from 'querystring';
+import { DynamoDBService } from './dynamo-dbservice.service';
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +27,11 @@ export class AuthService {
     idToken: '',
   };
 
-  constructor(private router: Router, private s3Service: S3Service) {
+  constructor(
+    private router: Router,
+    private s3Service: S3Service,
+    private dynamoDBService: DynamoDBService
+  ) {
     this.cognitoClient = new CognitoIdentityProviderClient({
       region: COGNITO_CONFIG.REGION,
     });
@@ -119,7 +124,7 @@ export class AuthService {
     const command = new UpdateUserAttributesCommand(input);
     this.cognitoClient
       .send(command)
-      .then((res) => console.log(res))
+      .then((res) => ((this.user as any)[name] = value))
       .catch((err) => console.log(err));
   }
 
@@ -148,7 +153,11 @@ export class AuthService {
     return this.user.uId;
   }
   public async uploadVideo(metadata: IMetadata, video: any) {
-    this.s3Service.uploadVideo(video);
-    console.log(metadata);
+    this.s3Service.uploadVideo(video, metadata.uId);
+    this.updateUser(
+      'custom:uploadedVideos',
+      (this.user.UploadedVideos?.push(metadata.uId) || []).toString()
+    );
+    this.dynamoDBService.insertMD(metadata);
   }
 }

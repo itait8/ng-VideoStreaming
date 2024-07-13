@@ -23,10 +23,11 @@ export class UploadComponent {
   onFileSelected(event: any): void {
     this.selectedFile = event.target.files[0] ?? null;
     console.log(this.selectedFile);
+    this.selectedFile.getContext();
   }
 
   public uploadVideo() {
-    if (this.form?.valid) {
+    if (this.form?.valid && this.selectedFile?.size < 100000000) {
       const formValues = this.form.form.value;
       const videoToUpload: IMetadata = {
         uId: uuidv4(),
@@ -35,7 +36,6 @@ export class UploadComponent {
         uploadedBy: this.authService.getUserId(),
         description: formValues.description,
         comments: '',
-        videoURL: '',
         ThumbnailURL: formValues.thumbnail,
       };
       this.authService.uploadVideo(videoToUpload, this.selectedFile);

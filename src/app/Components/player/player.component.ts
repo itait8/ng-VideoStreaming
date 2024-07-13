@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { DynamoDBService } from '../../Services/dynamo-dbservice.service';
 import { VideoService } from '../../Services/video.service';
+import { S3Service } from '../../Services/s3.service';
 
 @Component({
   selector: 'app-player',
@@ -14,10 +15,17 @@ import { VideoService } from '../../Services/video.service';
 })
 export class PlayerComponent {
   public video: IMetadata | undefined;
-  constructor(private videoService: VideoService, private router: Router) {
-    videoService.generateURL().then((res) => {
-      if (this.video?.videoURL) this.video.videoURL = res as string;
+  public signedURL = '';
+  constructor(
+    private dynamoDBService: DynamoDBService,
+    private router: Router,
+    private s3Service: S3Service
+  ) {
+    console.log(router.url.split('/')[2]);
+    this.video = dynamoDBService.getMetadataById(router.url.split('/')[2]);
+
+    s3Service.getVideo(router.url.split('/')[2]).then((res) => {
+      this.signedURL = res as string;
     });
-    this.video = videoService.getMetadataById(router.url.split('/')[2]);
   }
 }

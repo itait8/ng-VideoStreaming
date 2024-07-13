@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { PreviewComponent } from '../preview/preview.component';
 import { VideoService } from '../../Services/video.service';
 import { AuthService } from '../../Services/auth.service';
+import { DynamoDBService } from '../../Services/dynamo-dbservice.service';
 
 @Component({
   selector: 'app-home',
@@ -23,13 +24,15 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private videoService: VideoService,
-    private authService: AuthService
+    private authService: AuthService,
+    private dynamoDBService: DynamoDBService
   ) {
     authService.getUser().subscribe((user) => {
       this.user = user;
     });
-    this.videoService.getMetadata()?.subscribe((data) => {
-      this.MDs = data;
+    this.dynamoDBService.getMetaData().subscribe((metadata) => {
+      console.log(metadata);
+      this.MDs = metadata;
     });
   }
 

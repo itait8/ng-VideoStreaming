@@ -1,13 +1,18 @@
 <div class="video-page" *ngIf="video">
-    <div class="video-page__video-player">
-        <video class="player" controls preload="auto" data-config="some-js-object-here">
-    <source src={{video.videoURL}} type='video/mp4'>
-</video>
-</div>
-<div class="video-page__metadata">
-    <h2>{{video.name}}</h2>
-    <p>{{video.description}}</p>
-    <p>{{video.uploadTime}}</p>
-</div>
-<div class="video-page__comments"></div>
+  <div class="video-page__video-player" *ngIf="signedURL">
+    <video
+      class="player"
+      controls
+      preload="auto"
+      data-config="some-js-object-here"
+    >
+      <source src="{{ signedURL }}" type="video/mp4" />
+    </video>
+  </div>
+  <div class="video-page__metadata">
+    <h2>{{ video.name }}</h2>
+    <p>{{ video.description }}</p>
+    <p>{{ video.uploadTime }}</p>
+  </div>
+  <div class="video-page__comments"></div>
 </div>

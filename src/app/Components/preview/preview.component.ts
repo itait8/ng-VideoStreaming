@@ -5,6 +5,7 @@ import { MaterialModule } from '../../Material/Material.module';
 import { Router } from '@angular/router';
 import { AuthService } from '../../Services/auth.service';
 import { IUser, emptyUser } from '../../Models/User.interface';
+import { S3Service } from '../../Services/s3.service';
 
 @Component({
   selector: 'app-preview',
@@ -17,6 +18,7 @@ export class PreviewComponent implements OnInit {
   private user: IUser = emptyUser;
   public metadata: IMetadata | undefined;
   public uploadString: string = '';
+  public signedURL = '';
 
   public bookmarkIconType: string = '';
 
@@ -26,32 +28,24 @@ export class PreviewComponent implements OnInit {
   @Input() set preview(preview: IMetadata) {
     if (preview) {
       this.metadata = preview;
-      this.uploadString = this.diffTime(
-        new Date(),
-        this.formatStringToDate(this.metadata.uploadTime.toString())
-      );
+      this.uploadString = this.diffTime(new Date(), this.metadata.uploadTime);
+
+      this.s3Service
+        .getVideo(this.metadata.uId)
+        .then((res) => (this.signedURL = res));
     }
   }
 
-  constructor(private router: Router, private authService: AuthService) {
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private s3Service: S3Service
+  ) {
     this.authService.getUser().subscribe((user) => (this.user = user));
   }
 
-  private formatStringToDate(uploadTime: string): Date {
-    const parsedDate: string[] = uploadTime.split('/');
-    var formattedString: string = '';
-    if (parsedDate[0].length == 1) {
-      parsedDate[0] = '0'.concat(parsedDate[0]);
-    }
-    if (parsedDate[1].length == 1) {
-      parsedDate[1] = '0'.concat(parsedDate[1]);
-    }
-
-    formattedString = parsedDate.reverse().join('-');
-    return new Date(Date.parse(formattedString));
-  }
-
   public diffTime(x: Date, y: Date): string {
+    console.log(this.metadata);
     const diff: number = x.getTime() - y.getTime();
     const years = diff / (1000 * 60 * 60 * 24 * 365);
     if (years > 1) {
