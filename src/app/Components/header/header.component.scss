@@ -4,30 +4,55 @@
   justify-content: space-between;
   align-items: start;
   padding: 30px;
+  height: 300px;
 
   &__sidebar {
-    ul {
-      padding: 0px;
-      li {
-        margin: 10px 0;
-        a {
-          text-decoration: none;
-          color: blue;
-          .icon {
-            display: inline-block;
-            width: 23px;
-            padding-right: 3px;
-            
-          }
-        }
+    .logo {
+      position: relative;
+      top: -23px;
+      img {
+        height: 114px;
+        width: 402px;
+      }
+    }
+  }
 
-        a:hover{
-          color:darkblue;
-          
+  &__menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+
+    .menu-item {
+      cursor: pointer;
+      padding-left: 10px;
+      width: 200px;
+      height: 50px;
+      border-radius: 10px;
+      align-content: center;
+
+      a {
+        text-decoration: none;
+        color: rgb(73, 73, 73);
+        .icon {
+          display: inline-block;
+          width: 23px;
+          padding-right: 3px;
         }
       }
+    }
 
-      list-style: none;
+    .menu-item.active {
+      background-color: rgba(219, 217, 217, 0.329);
+      a {
+        color: black;
+      }
+    }
+
+    .menu-item:hover {
+      background-color: rgba(204, 202, 202, 0.329);
+      a {
+        color: black;
+      }
     }
   }
 

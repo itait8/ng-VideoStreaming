@@ -1,0 +1,12 @@
+.tabs-container {
+  position: relative;
+  top: -230px;
+  left: 283px;
+  width: 1300px;
+
+  &__tabs-group {
+    margin: auto;
+    align-self: center;
+    width: 80vw;
+  }
+}

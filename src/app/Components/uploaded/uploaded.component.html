@@ -1,0 +1,9 @@
+<div class="metadatas-container" *ngIf="uploaded">
+  <mat-grid-list cols="3" rowHeight="300px" class="metadatas-container__grid">
+    @for (video of uploaded; track video) {
+    <mat-grid-tile class="metadatas-container__cell"
+      ><app-preview [preview]="video" [isFavoriteVideo]="true"></app-preview
+    ></mat-grid-tile>
+    }
+  </mat-grid-list>
+</div>

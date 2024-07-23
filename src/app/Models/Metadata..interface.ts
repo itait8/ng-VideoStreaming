@@ -7,5 +7,4 @@ export interface IMetadata {
   uploadedBy: string;
   description: string;
   comments: Array<IComment> | string;
-  ThumbnailURL: string;
 }

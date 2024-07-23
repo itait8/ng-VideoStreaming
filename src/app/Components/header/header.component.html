@@ -5,30 +5,41 @@
       <img src="assets\Logo\logo_ver2.webp" alt="logo" />
     </div>
 
-    <div class="d-flex text-center flex-wrap">
-      <ul>
-        <li>
-          <a [routerLink]="['/Home']" routerLinkActive="active">
-            <div class="icon"><i class="fa-solid fa-house"></i></div>
-            Home</a
-          >
-        </li>
-        <li>
-          <a [routerLink]="['/Channel']"
-            ><div class="icon"><i class="fa-solid fa-user"></i></div>
-            Channel</a
-          >
-        </li>
-      </ul>
+    <div class="header__menu">
+      <div class="menu-item" [routerLink]="['/Home']" routerLinkActive="active">
+        <a>
+          <span class="icon"><i class="fa-solid fa-house"></i></span>
+          Home</a
+        >
+      </div>
+      <div
+        class="menu-item"
+        [routerLink]="['/Channel']"
+        routerLinkActive="active"
+        *ngIf="isLoggedIn"
+      >
+        <a
+          ><span class="icon"><i class="fa-solid fa-user"></i></span> Channel</a
+        >
+      </div>
     </div>
   </div>
   <div class="header__search-bar-container">
     <mat-form-field class="header__search-bar">
       <mat-label>Search</mat-label>
-      <input matInput type="text" [(ngModel)]="value" />
-      @if (value) {
+      <input matInput type="text" [(ngModel)]="searchValue" />
+      @if (searchValue) {
       <button matSuffix mat-icon-button aria-label="Clear" (click)="search()">
         <mat-icon>search</mat-icon>
+      </button>
+      } @else {
+      <button
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        (click)="clearSearch()"
+      >
+        <mat-icon>clear</mat-icon>
       </button>
       }
     </mat-form-field>

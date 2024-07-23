@@ -21,6 +21,9 @@ export class AuthService {
   private isLoggenIn$: BehaviorSubject<boolean> = new BehaviorSubject(false);
   private cognitoClient: CognitoIdentityProviderClient;
   private userDetails$: Subject<IUser> = new Subject<IUser>();
+  private favorites$: Subject<Array<IMetadata>> = new Subject();
+  private favorites: Array<IMetadata> = [];
+  private uploaded: Array<IMetadata> = [];
   private user: IUser = emptyUser;
   private Tokens: { accessToken: string; idToken: string } = {
     accessToken: '',
@@ -51,33 +54,39 @@ export class AuthService {
     this.isLoggenIn$.next(false);
     this.Tokens = { accessToken: '', idToken: '' };
     this.user = emptyUser;
+    this.router.navigate(['/Home']);
   }
 
   private setTokens(url: string): void {
     const parsedUrl = this.router.url.split(/[#&=]/);
-    const idToken =
-      parsedUrl[parsedUrl.findIndex((attr) => attr == 'id_token') + 1];
-    const accessToken =
-      parsedUrl[parsedUrl.findIndex((attr) => attr == 'access_token') + 1];
-    this.Tokens = { accessToken, idToken };
+    console.log(parsedUrl);
+    if (parsedUrl.length > 4) {
+      const idToken =
+        parsedUrl[parsedUrl.findIndex((attr) => attr == 'id_token') + 1];
+      const accessToken =
+        parsedUrl[parsedUrl.findIndex((attr) => attr == 'access_token') + 1];
+      this.Tokens = { accessToken, idToken };
+    }
   }
 
   public login(): void {
     this.setTokens(this.router.url);
+    if (this.Tokens.accessToken != '') {
+      console.log(this.Tokens);
+      const input = {
+        AccessToken: this.Tokens.accessToken,
+      };
+      const command = new GetUserCommand(input);
 
-    const input = {
-      AccessToken: this.Tokens.accessToken,
-    };
-    const command = new GetUserCommand(input);
-
-    this.cognitoClient
-      .send(command)
-      .then((res) => {
-        this.setUser(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      this.cognitoClient
+        .send(command)
+        .then((res) => {
+          this.setUser(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   }
 
   private setUser(getUserCommantOutput: GetUserCommandOutput): void {
@@ -108,6 +117,7 @@ export class AuthService {
     this.userDetails$.next(this.user);
     console.log(this.user);
     console.log(this.userDetails$);
+    console.log(this.user.Favorites);
     //this.router.navigate(['/Home']);
   }
 
@@ -116,37 +126,33 @@ export class AuthService {
   }
 
   public updateUser(name: string, value: string): void {
-    const input = {
-      UserAttributes: [{ Name: name, Value: value }],
-      AccessToken: this.Tokens.accessToken,
-    };
+    if (this.Tokens.accessToken != '') {
+      const input = {
+        UserAttributes: [{ Name: name, Value: value }],
+        AccessToken: this.Tokens.accessToken,
+      };
 
-    const command = new UpdateUserAttributesCommand(input);
-    this.cognitoClient
-      .send(command)
-      .then((res) => ((this.user as any)[name] = value))
-      .catch((err) => console.log(err));
+      const command = new UpdateUserAttributesCommand(input);
+      this.cognitoClient
+        .send(command)
+        .then((res) => ((this.user as any)[name] = value))
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   }
 
-  public addFavorite(videoURL: string): void {
-    this.updateUser(
-      'custom:favoritesVideos',
-      videoURL + ', ' + (this.user.Favorites || [])
-    );
-    console.log(this.user.Favorites);
+  public addFavorite(videoId: string): void {
+    this.user.Favorites?.push(videoId);
+    this.updateUser('custom:favoritesVideos', this.user.Favorites?.join(','));
   }
 
-  public removeFavorite(videoURL: string): void {
-    if (
-      this.user.Favorites?.findIndex((favorite) => favorite == videoURL) != -1
-    )
-      this.updateUser(
-        'custom:favoritesVideos',
-        this.user.Favorites?.filter((favorite) => favorite != videoURL).join(
-          ', '
-        ) || ''
+  public removeFavorite(videoID: string): void {
+    if (this.user.Favorites?.includes(videoID))
+      this.user.Favorites = this.user.Favorites?.filter(
+        (favorite) => favorite != videoID
       );
-    console.log(this.user.Favorites);
+    this.updateUser('custom:favoritesVideos', this.user.Favorites.join(','));
   }
 
   public getUserId() {
@@ -159,5 +165,30 @@ export class AuthService {
       (this.user.UploadedVideos?.push(metadata.uId) || []).toString()
     );
     this.dynamoDBService.insertMD(metadata);
+  }
+
+  public getFavorites() {
+    this.favorites = [];
+    this.dynamoDBService.getMetaData().subscribe((videos) => {
+      videos.forEach((video) => {
+        if (
+          this.user.Favorites?.findIndex((favorite) => favorite == video.uId) !=
+          -1
+        )
+          this.favorites.push(video);
+      });
+    });
+    return this.favorites;
+  }
+
+  public getUploaded() {
+    this.uploaded = [];
+    this.dynamoDBService.getMetaData().subscribe((videos) => {
+      videos.forEach((video) => {
+        if (this.user.UploadedVideos?.includes(video.uId))
+          this.uploaded.push(video);
+      });
+    });
+    return this.uploaded;
   }
 }

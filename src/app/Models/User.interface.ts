@@ -4,7 +4,7 @@ export interface IUser {
   PhotoURL: string;
   uId: string;
   UploadedVideos?: Array<string>;
-  Favorites?: Array<string | null>;
+  Favorites: Array<string>;
 }
 
 export const emptyUser: IUser = {

@@ -36,7 +36,6 @@ export class UploadComponent {
         uploadedBy: this.authService.getUserId(),
         description: formValues.description,
         comments: '',
-        ThumbnailURL: formValues.thumbnail,
       };
       this.authService.uploadVideo(videoToUpload, this.selectedFile);
       this.dialog.closeAll();

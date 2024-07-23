@@ -1,0 +1,9 @@
+<div class="metadatas-container" *ngIf="favorites">
+  <mat-grid-list cols="3" rowHeight="300px" class="metadatas-container__grid">
+    @for (favorite of favorites; track favorite) {
+    <mat-grid-tile class="metadatas-container__cell"
+      ><app-preview [preview]="favorite" [isFavoriteVideo]="true"></app-preview
+    ></mat-grid-tile>
+    }
+  </mat-grid-list>
+</div>
