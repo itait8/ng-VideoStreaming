@@ -42,7 +42,7 @@ export class AuthService {
 
   public loginPage(): void {
     window.location.href =
-      'https://video-streaming-user-pool.auth.eu-north-1.amazoncognito.com/login?client_id=6gad5tgoq2r3i51t3imauusr4r&response_type=token&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=http://localhost:4200/Home';
+      COGNITO_CONFIG.LOGIN-LINK;
     this.isLoggenIn$.next(true);
   }
 
