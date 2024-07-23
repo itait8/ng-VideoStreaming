@@ -41,8 +41,7 @@ export class AuthService {
   }
 
   public loginPage(): void {
-    window.location.href =
-      COGNITO_CONFIG.LOGIN-LINK;
+    window.location.href = COGNITO_CONFIG.LOGIN_LINK;
     this.isLoggenIn$.next(true);
   }
 

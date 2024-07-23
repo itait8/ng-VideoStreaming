@@ -1,15 +1,20 @@
 .preview {
   margin: 5px;
-  img {
-    height: 180px;
-    width: 320px;
-    border-radius: 12px;
-  }
-
   video {
     height: 180px;
     width: 320px;
     border-radius: 12px;
+    cursor: pointer;
+  }
+
+  video::after {
+    content: "";
+    display: inline-block;
+    height: 180px;
+    width: 320px;
+    border: 20px dashed brown;
+    border-radius: 12px;
+    background-color: black;
   }
 
   &__container {
